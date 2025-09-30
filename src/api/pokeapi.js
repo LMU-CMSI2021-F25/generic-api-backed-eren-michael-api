@@ -37,3 +37,5 @@ export async function pingApi({ timeoutMs = 5000 } = {}) {
         return { ok: false, error: error.message };
     }
 }
+
+export { API_BASE }
