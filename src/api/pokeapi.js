@@ -38,4 +38,4 @@ export async function pingApi({ timeoutMs = 5000 } = {}) {
     }
 }
 
-export { API_BASE }
+export { API_BASE };
