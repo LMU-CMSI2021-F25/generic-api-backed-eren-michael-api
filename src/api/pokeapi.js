@@ -38,4 +38,19 @@ export async function pingApi({ timeoutMs = 5000 } = {}) {
     }
 }
 
+// Fetching a list of generations from the API and formatting them in Roman numerals
+export async function listGenerations() {
+    try {
+        const data = await fetchJson(`${API_BASE}/generation?limit=40`, { useCache: true});
+        const roman = n => ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX'][n] || String(n);
+        return data.results.map((result, i) => {
+            const idMatch = result.url.match(/\/generation\/(\d+)\//);
+            const id = idMatch ? Number(idMatch[1]) : i + 1;
+            return { id, key: result.name, label: `Gen ${roman(id)}` };
+        });
+    } catch {
+        return Array.from({ length: 9 }, (_, i) => ({ id: i + 1, key: `generation-${i + 1}`, label: `Gen ${i + 1}` })); // Fallback if API boof.
+    }
+}
+
 export { API_BASE };
