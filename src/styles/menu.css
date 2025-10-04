@@ -1,0 +1,151 @@
+/* Layout */
+.main {
+  display: grid;
+  grid-template-columns: 320px 1fr;  /* left fixed, right fluid */
+  gap: 24px;
+  align-items: start;
+  max-width: 1200px;
+  margin: 24px auto;
+  padding: 0 16px;
+}
+
+@media (max-width: 780px){
+  .main { grid-template-columns: 1fr; }
+}
+
+.menu-grid {
+  min-height: calc(100dvh - 120px);
+  background: transparent;
+  border: none;
+  backdrop-filter: none;
+}
+
+.pane-left, .pane-right {
+  position: relative;
+  padding: 16px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.pane-left::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  /* thickness controls */
+  --b: 6px;          /* border thickness */
+  --c: 20px;         /* corner size */
+
+  /* four sides */
+  background:
+    /* top & bottom bars */
+    linear-gradient(#000 0 0) top / 100% var(--b) no-repeat,
+    linear-gradient(#000 0 0) bottom / 100% var(--b) no-repeat,
+    /* left & right bars */
+    linear-gradient(#000 0 0) left / var(--b) 100% no-repeat,
+    linear-gradient(#000 0 0) right / var(--b) 100% no-repeat,
+
+    /* stylized corners (small diagonal caps) */
+    linear-gradient(135deg, transparent calc(var(--c) - var(--b)), #000 0) top left / var(--c) var(--c) no-repeat,
+    linear-gradient(225deg, transparent calc(var(--c) - var(--b)), #000 0) top right / var(--c) var(--c) no-repeat,
+    linear-gradient(45deg,  transparent calc(var(--c) - var(--b)), #000 0) bottom left / var(--c) var(--c) no-repeat,
+    linear-gradient(315deg, transparent calc(var(--c) - var(--b)), #000 0) bottom right / var(--c) var(--c) no-repeat;
+}
+
+.panel-title {
+  margin: 0 0 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+/* Gen list */
+.gen-scroller {
+  /* Let it grow; add scrolling only if it overflows */
+  max-height: none;
+  overflow: auto;
+  padding-right: 6px;
+}
+
+/* Auto-fill grid: adjusts to width and available space */
+.gen-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  grid-auto-rows: 46px;
+  gap: 12px;
+  align-content: start;
+}
+
+.btn {
+  width: 100%;
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #e6e7e3;
+  color: #111;
+  border: 2px solid #000;
+  border-radius: 8px;
+  box-shadow: none;
+
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  font-weight: 700;
+
+  transition: transform .08s ease, filter .12s ease;
+}
+.btn:hover   { filter: brightness(0.95); transform: translateY(-1px); }
+.btn:active  { transform: translateY(0); filter: brightness(0.9); }
+
+/* Selected state */
+.btn[data-active="true"] {
+  background: #dcdcD6;
+}
+
+/* Status display */
+.status-row {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.api-pill {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 14px;
+  background: rgba(0,0,0,0.06);
+  border: 1px solid rgba(0,0,0,0.06);
+}
+.api-pill.online { color: #22be49; }
+.api-pill.offline { color: #e03c3c; }
+
+.mini-btn {
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 0;
+  background: rgba(0, 0, 0, 0.12);
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.15s ease, transform 0.12s ease, background 0.15s ease;
+}
+.mini-btn:hover { filter: brightness(1.05); transform: translateY(-1px); }
+
+/* CTA stack */
+.cta-stack {
+  display: grid;
+  gap: 14px;
+  margin-top: 20px;
+}
+.row-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}

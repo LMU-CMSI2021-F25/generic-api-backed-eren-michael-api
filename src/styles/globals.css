@@ -1,0 +1,135 @@
+@font-face {
+  font-family: "Pokemon";
+  src: url("/src/assets/Pokemon.ttf") format("truetype");
+  font-display: swap;
+}
+
+:root {
+  /* Brand & UI */
+  --bg1: #0c1022;
+  --bg2: #162142;
+  --ink: #e7ecf6;
+  --muted: #aab6cf;
+  --accent: #4da3ff;
+  --surface: rgba(255, 255, 255, 0.05);
+  --surface-2: rgba(0, 0, 0, 0.2);
+  --radius: 16px;
+
+  --bg-top: #f6f8fb;
+  --bg-bottom: #ffffff;
+  --bg-base: #fcfcfc; /* main background */
+  --stripe-width: 2px;
+  --stripe-gap: 15px;
+  --stripe-color: rgba(229,231,225,0.65);
+}
+
+* {
+    font-family: Pokemon, system-ui, sans-serif;
+    letter-spacing: 0;
+    color: #000;
+    box-sizing: border-box; 
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+
+  /* Base color + Gameboy-style vertical stripes */
+  background-color: var(--bg-base);
+  background-image:
+    repeating-linear-gradient(
+      180deg,
+      var(--stripe-color) 0 var(--stripe-width),
+      transparent var(--stripe-width) var(--stripe-gap)
+    );
+  background-attachment: fixed; /* keeps stripes steady during scroll */
+  background-repeat: repeat;
+}
+
+/* App Layout */
+.app-shell {
+  min-height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  padding: 24px;
+  gap: 24px;
+}
+
+.app-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.app-title {
+  margin: 0;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
+}
+
+.app-subtitle {
+  margin: 0;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+/* Buttons (shared) */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: var(--radius);
+  border: 0;
+  background: rgba(0, 0, 0, 0.12);
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.2px;
+  transition: transform 0.15s ease, filter 0.15s ease, background 0.15s ease;
+}
+.btn:hover { filter: brightness(1.05); transform: translateY(-1px); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Active toggle look for selection buttons */
+.btn[data-active="true"] {
+  background: rgba(0, 0, 0, 0.22);
+}
+
+/* Bigger CTA */
+.btn.big {
+  min-height: 72px;
+  font-size: 20px;
+}
+
+/* Offline banner */
+.offline-banner {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #c93b3b;
+  color: white;
+  padding: 8px 14px;
+  font-size: 14px;
+  letter-spacing: 0.2px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Card */
+.menu-card {
+  max-width: 720px;
+  padding: 24px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--surface);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+}
