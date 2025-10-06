@@ -4,6 +4,13 @@
   font-display: swap;
 }
 
+/* Global blink clock */
+@property --gb-blink {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+
 :root {
   /* Brand & UI */
   --bg1: #0c1022;
@@ -21,6 +28,12 @@
   --stripe-width: 2px;
   --stripe-gap: 15px;
   --stripe-color: rgba(229,231,225,0.65);
+  animation: gbBlink 1.1s steps(2, end) infinite;
+}
+
+@keyframes gbBlink {
+  0%, 45%   { --gb-blink: 0.2; }
+  50%, 100% { --gb-blink: 1;   }
 }
 
 * {
@@ -33,6 +46,7 @@
 html, body, #root {
   height: 100%;
   margin: 0;
+  animation: gbBlink 1.1s steps(2, end) infinite;
 }
 
 body {
@@ -88,7 +102,7 @@ body {
   padding: 0 18px;
   border-radius: var(--radius);
   border: 0;
-  background: rgba(0, 0, 0, 0.12);
+  background: rgba(0, 0, 0, 0);
   color: #ffffff;
   font-weight: 700;
   cursor: pointer;
@@ -100,7 +114,34 @@ body {
 
 /* Active toggle look for selection buttons */
 .btn[data-active="true"] {
-  background: rgba(0, 0, 0, 0.22);
+  background: rgba(0, 0, 0, 0.00);
+}
+
+/* Scope to left pane gen list only */
+.pane-left .gen-list .btn {
+  position: relative; /* anchor for the triangle */
+  overflow: visible; /* let triangle sit outside */
+}
+
+/* Active state: small blinking triangle pointer on the left */
+.pane-left .gen-list .btn[data-active="true"]::before {
+  --tri-size: 6px;
+  --tri-color: #000;
+  content: "";
+  position: absolute;
+  left: -8px;                 /* closer to the button */
+  top: 50%;
+  transform: translateY(-50%); /* vertical centering only */
+  width: 0;
+  height: 0;
+
+  border-top: var(--tri-size) solid transparent;
+  border-bottom: var(--tri-size) solid transparent;
+  border-left: var(--tri-size) solid var(--tri-color);
+
+  opacity: var(--gb-blink, 1);
+  will-change: opacity;
+  pointer-events: none;
 }
 
 /* Bigger CTA */

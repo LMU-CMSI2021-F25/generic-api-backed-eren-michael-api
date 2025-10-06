@@ -13,6 +13,7 @@ export default function MainMenu({
   setSelectedGens,
 }) {
   const [gens, setGens] = useState([]);
+  const [blinkKey, setBlinkKey] = useState(0);
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -20,6 +21,7 @@ export default function MainMenu({
     (async () => {
       const data = await listGenerations();
       if (alive) setGens(data);
+      if (alive) setBlinkKey(k => k + 1);
     })();
     return () => { alive = false; };
   }, []);
@@ -37,7 +39,7 @@ export default function MainMenu({
         <h2 className="panel-title">Generations</h2>
 
         <div className="gen-scroller" ref={scrollRef} aria-label="Select Pokémon generations">
-          <ul className="gen-list">
+          <ul className="gen-list" key={blinkKey}>
             {gens.map(gen => (
               <li key={gen.id}>
                 <button
