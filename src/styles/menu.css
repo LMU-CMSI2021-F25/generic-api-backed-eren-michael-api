@@ -1,7 +1,7 @@
 /* Layout */
 .main {
   display: grid;
-  grid-template-columns: 320px 1fr;  /* left fixed, right fluid */
+  grid-template-columns: 320px 1fr;
   gap: 24px;
   align-items: start;
   max-width: 1200px;
@@ -33,21 +33,13 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-
-  /* thickness controls */
-  --b: 6px;          /* border thickness */
-  --c: 20px;         /* corner size */
-
-  /* four sides */
+  --b: 6px;   /* border thickness */
+  --c: 20px;  /* corner size */
   background:
-    /* top & bottom bars */
     linear-gradient(#000 0 0) top / 100% var(--b) no-repeat,
     linear-gradient(#000 0 0) bottom / 100% var(--b) no-repeat,
-    /* left & right bars */
     linear-gradient(#000 0 0) left / var(--b) 100% no-repeat,
     linear-gradient(#000 0 0) right / var(--b) 100% no-repeat,
-
-    /* stylized corners (small diagonal caps) */
     linear-gradient(135deg, transparent calc(var(--c) - var(--b)), #000 0) top left / var(--c) var(--c) no-repeat,
     linear-gradient(225deg, transparent calc(var(--c) - var(--b)), #000 0) top right / var(--c) var(--c) no-repeat,
     linear-gradient(45deg,  transparent calc(var(--c) - var(--b)), #000 0) bottom left / var(--c) var(--c) no-repeat,
@@ -62,13 +54,11 @@
 
 /* Gen list */
 .gen-scroller {
-  /* Let it grow; add scrolling only if it overflows */
   max-height: none;
   overflow: auto;
   padding-right: 6px;
 }
 
-/* Auto-fill grid: adjusts to width and available space */
 .gen-list {
   list-style: none;
   margin: 0;
@@ -80,32 +70,17 @@
   align-content: start;
 }
 
-.btn {
+/* Tile buttons scoped to menu to avoid overriding global .btn */
+.menu-grid .btn {
   width: 100%;
   height: 100%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  background: #e6e7e3;
-  color: #111;
-  border: 2px solid #000;
-  border-radius: 8px;
+  background: transparent;
   box-shadow: none;
-
   text-transform: uppercase;
   letter-spacing: .4px;
-  font-weight: 700;
-
-  transition: transform .08s ease, filter .12s ease;
 }
-.btn:hover   { filter: brightness(0.95); transform: translateY(-1px); }
-.btn:active  { transform: translateY(0); filter: brightness(0.9); }
-
-/* Selected state */
-.btn[data-active="true"] {
-  background: #dcdcD6;
-}
+.menu-grid .btn:hover  { filter: brightness(0.95); transform: translateY(-1px); }
+.menu-grid .btn:active { transform: translateY(0); filter: brightness(0.9); }
 
 /* Status display */
 .status-row {
@@ -115,6 +90,7 @@
   align-items: center;
   margin-bottom: 16px;
 }
+
 .api-pill {
   padding: 6px 10px;
   border-radius: 999px;
