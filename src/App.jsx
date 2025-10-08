@@ -4,6 +4,7 @@ import MainMenu from './components/MainMenu'
 import { SettingsProvider } from './components/SettingsContext'
 import { pingApi } from './api/pokeapi'
 import { useGameLoop } from './components/useGameLoop'
+import { useSettings } from './components/SettingsContext';
 import BattleView from './components/BattleView'
 import './styles/globals.css'
 
@@ -33,6 +34,7 @@ function AppContent() {
   const [selectedGens, setSelectedGens] = useState(new Set());
 
   const loop = useGameLoop({ onFxIntro });
+  const { settings } = useSettings();
 
   useEffect(() => {
     let cancelled = false;
@@ -82,6 +84,9 @@ function AppContent() {
         <header className="app-header">
           <h1 className="app-title">Poké Randomizer</h1>
           <p className="app-subtitle">phase: {loop.phase}</p>
+          {settings.seed && /^[A-Z0-9]{6}$/.test(settings.seed) && (
+            <span style={{ marginLeft: 8, opacity: .7 }}>Seed: {settings.seed}</span>
+          )}
         </header>
 
         {loop.phase === 'idle' ? (

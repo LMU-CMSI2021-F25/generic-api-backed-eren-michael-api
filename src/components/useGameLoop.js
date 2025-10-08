@@ -5,10 +5,29 @@ import {
 } from "../api/pokeapi";
 import { useSettings } from "./SettingsContext";
 
+
+/** Seeded RNG (mulberry32) from a string */
+function hashSeed(str) {
+  let h = 1779033703 ^ (str?.length || 0);
+  for (let i = 0; i < (str?.length || 0); i++) {
+    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  return (h >>> 0) || 0x9E3779B1; // non-zero default
+}
+
+function mulberry32(a) {
+  return function() {
+    a |= 0;
+    a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
 const REROLLS_BY_DIFFICULTY = { casual: 6, standard: 4, elite: 2 };
 const ROUNDS_BY_DIFFICULTY  = { casual: 6, standard: 8, elite: 10 };
-
-const pick  = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 function metaForMove(name, metaList) {
   return metaList?.find?.(m => m.name === name);
@@ -33,9 +52,10 @@ function composeCandidateFrom(current, locks, source) {
 const allLocked = (L) => L.type && L.offenses && L.defenses && L.hp && L.moves && L.speed;
 
 /* Battle helpers */
-function chooseMove(list) { 
-    return list[(Math.random() * list.length) | 0]; 
+function chooseMove(list, rnd) {
+  return list[(rnd() * list.length) | 0];
 }
+
 function applySupport(effect, self, foe) {
   switch (effect) {
     case "heal":        self.hp = Math.min(self.hpMax, Math.round(self.hp + self.hpMax * 0.3)); break;
@@ -43,7 +63,7 @@ function applySupport(effect, self, foe) {
     case "def_up":      self.def = Math.round(self.def * 1.2); self.spDef = Math.round(self.spDef * 1.2); break;
     case "atk_spd_up":  self.atk = Math.round(self.atk * 1.1); self.spAtk = Math.round(self.spAtk * 1.1); self.speed = Math.round(self.speed * 1.1); break;
     case "paralyze":    foe.speed = Math.max(1, Math.round(foe.speed * 0.7)); break;
-    case "sleep":       foe.skipNext = Math.random() < 0.5; break;
+    case "sleep":       foe.skipNext = (rngRef.current() < 0.5); break;
     case "confuse":     foe.selfHitChance = 0.25; break;
     default: break;
   }
@@ -85,6 +105,7 @@ export function useGameLoop({ onFxIntro }) {
     candidate: null,
     locks: { type: false, offenses: false, defenses: false, hp: false, moves: false, speed: false },
   });
+  const rngRef = useRef(() => Math.random()); // default to non-seeded
   const providerRef = useRef("online"); // "online" | "offline"
 
   const start = useCallback(async ({ selectedGens, offline = false }) => {
@@ -96,10 +117,21 @@ export function useGameLoop({ onFxIntro }) {
   // Ensure type chart is ready
   if (!typeChartRef.current) typeChartRef.current = await loadTypeChart();
 
+  // Build seeded RNG if user provided a seed like "4F9ZK2"
+  if (settings.seed && /^[A-Z0-9]{6}$/.test(settings.seed)) {
+    rngRef.current = mulberry32(hashSeed(settings.seed));
+  } else {
+    rngRef.current = () => Math.random();
+  }
+
   // fetch boss + first candidate in parallel
   const [boss, candidate] = await Promise.all([
-    offline ? pickBossFromOffline() : pickBossFromGenerations(selectedGens),
-    offline ? pickRandomPlayableOffline() : pickRandomPlayable(),
+    offline
+      ? pickBossFromOffline({ rng: rngRef.current })
+      : pickBossFromGenerations(selectedGens, { rng: rngRef.current }),
+    offline
+      ? pickRandomPlayableOffline({ rng: rngRef.current })
+      : pickRandomPlayable({ rng: rngRef.current }),
   ]);
   bossRef.current = boss;
   playerRef.current = {
@@ -120,8 +152,8 @@ export function useGameLoop({ onFxIntro }) {
     if (rerollsLeft <= 0) return;
     const P = playerRef.current;
     const srcRaw = providerRef.current === "offline"
-        ? await pickRandomPlayableOffline()
-        : await pickRandomPlayable();
+      ? await pickRandomPlayableOffline({ rng: rngRef.current })
+      : await pickRandomPlayable({ rng: rngRef.current });
     const src = { ...srcRaw, display: srcRaw.name, movesFrom: srcRaw.name}
     const next = { ...P.candidate };
     
@@ -170,7 +202,7 @@ export function useGameLoop({ onFxIntro }) {
     for (let r = 1; r <= rounds; r++) {
       const order = (user.speed > foe.speed) ? ["user","foe"]
                   : (user.speed < foe.speed) ? ["foe","user"]
-                  : (Math.random() < 0.5) ? ["user","foe"] : ["foe","user"];
+                  : (rngRef.current() < 0.5) ? ["user","foe"] : ["foe","user"];
 
       for (const side of order) {
         const me   = side === "user" ? user : foe;
@@ -178,12 +210,12 @@ export function useGameLoop({ onFxIntro }) {
         if (me.hp <= 0 || them.hp <= 0) break;
 
         if (me.skipNext) { me.skipNext = false; continue; }
-        if (me.selfHitChance && Math.random() < me.selfHitChance) {
+        if (me.selfHitChance && rngRef.current() < me.selfHitChance) {
           me.hp = Math.max(0, me.hp - Math.max(1, Math.round(0.05 * me.hpMax)));
           continue;
         }
 
-        const mv = chooseMove(me.moves);
+        const mv = chooseMove(me.moves, rngRef.current);
         const meta = metaForMove(mv, me.movesMeta);
         if (meta?.support || meta?.class === "status") {
           applySupport(meta.effect, me, them);
@@ -218,8 +250,8 @@ export function useGameLoop({ onFxIntro }) {
 
     const nextLocks = { ...P.locks, [key]: true };
     const srcRaw = providerRef.current === "offline"
-        ? await pickRandomPlayableOffline()
-        : await pickRandomPlayable();
+      ? await pickRandomPlayableOffline({ rng: rngRef.current })
+      : await pickRandomPlayable({ rng: rngRef.current });
     const newSource = { ...srcRaw, display: srcRaw.name, movesFrom: srcRaw.name };
     const merged = composeCandidateFrom(P.candidate, nextLocks, newSource);
     playerRef.current = { candidate: merged, locks: nextLocks };
@@ -258,6 +290,7 @@ export function useGameLoop({ onFxIntro }) {
 
   return useMemo(() => ({
     phase, result,
+    seed: settings.seed,
     boss: bossRef.current,
     player: playerRef.current,
     rerollsLeft,

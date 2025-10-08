@@ -55,14 +55,33 @@ export default function SettingsPanel({ onClose }) {
         </label>
 
         <label className="settings-row">
-          <span>Seed</span>
-          <input
-            type="text"
-            value={settings.seed}
-            placeholder="optional"
-            onChange={(e) => set({ seed: e.target.value })}
-          />
+            <span>Seed</span>
+            <div style={{ display: "flex", gap: 8 }}>
+              <input
+                type="text"
+                value={settings.seed}
+                placeholder="(e.g. 4F9ZK2)"
+                onChange={(e) => {
+                  const up = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6);
+                  set({ seed: up });
+                }}
+                style={{ width: 140 }}
+              />
+              <button
+                type="button"
+                className="mini-btn"
+                onClick={() => {
+                  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+                  let s = "";
+                  for (let i = 0; i < 6; i++) s += chars[(Math.random() * chars.length) | 0];
+                  set({ seed: s });
+                }}
+              >
+                Randomize
+              </button>
+            </div>
         </label>
+
 
         <div className="settings-actions">
           <button type="button" className="mini-btn" onClick={reset}>Reset</button>

@@ -174,7 +174,7 @@ export async function moveMeta(nameOrId) {
 /* build a playable mon from species */
 function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
-export async function playableFromSpecies(speciesName) {
+export async function playableFromSpecies(speciesName, { rng } = {}) {
   const sp  = await speciesMeta(speciesName);
   const def = sp.defaultPokemon;
   if (!def) throw new Error(`No default form for ${speciesName}`);
@@ -182,11 +182,13 @@ export async function playableFromSpecies(speciesName) {
   const core = await pokemonCore(def.name);
 
   // Sample 8 candidate moves, enrich, prefer damaging, select 4.
-  const sample = [...core.moveRefs].sort(()=>Math.random()-0.5).slice(0, 8);
+  const sample = sampleK(core.moveRefs, Math.min(8, core.moveRefs.length), rng);
   const metas  = await Promise.all(sample.map(m => with6(() => moveMeta(m.name))));
   const damaging = metas.filter(m => m.class !== "status" && (m.power ?? 0) > 0);
   const status   = metas.filter(m => m.class === "status" || (m.power ?? 0) === 0);
-  const chosen   = (damaging.length >= 4 ? damaging.slice(0,4) : [...damaging, ...status].slice(0,4));
+  const chosen   = (damaging.length >= 4
+    ? damaging.slice(0,4)
+    : [...damaging, ...status].slice(0,4));
 
   return {
     id: core.id,
@@ -204,7 +206,7 @@ export async function playableFromSpecies(speciesName) {
 }
 
 /* pick a legendary/mythical boss from gens */
-export async function pickBossFromGenerations(genIdsOrSet) {
+export async function pickBossFromGenerations(genIdsOrSet, { rng } = {}) {
   const gens = (genIdsOrSet && genIdsOrSet.size)
     ? Array.from(genIdsOrSet)
     : [1]; // fallback to Gen 1 if nothing is selected
@@ -215,19 +217,20 @@ export async function pickBossFromGenerations(genIdsOrSet) {
   // Flag species, keep legendary/mythical
   const infos = await Promise.all(allSpecies.map(s => with6(() => speciesMeta(s.name))));
   const pool  = infos.filter(s => s.isLegendary || s.isMythical);
-  const chosen = pool.length ? pick(pool) : pick(infos);
+  const chosen = (pool.length ? pickOne(pool, rng) : pickOne(infos, rng));
 
-  return playableFromSpecies(chosen.name);
+  return playableFromSpecies(chosen.name, { rng });
 }
 
 /* random playable mon across any generation (quick) */
-export async function pickRandomPlayable() {
-  // heuristic: pick a random gen (1..9), then random species from it
-  const randGen = Math.max(1, Math.floor(Math.random() * 9));
+export async function pickRandomPlayable({ rng } = {}) {
+  const R = rngOrMath(rng);
+  const randGen = 1 + ((R() * 9) | 0);
   const list = await speciesByGeneration(randGen);
-  const s = pick(list);
-  return playableFromSpecies(s.name);
+  const s = pickOne(list, rng);
+  return playableFromSpecies(s.name, { rng });
 }
+
 
 /* ==================== Dynamic type chart ==================== */
 
@@ -292,21 +295,37 @@ export async function loadOfflineGen1() {
   return data;
 }
 
-// helper to sample k items
-function sampleK(arr, k) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = (Math.random() * (i + 1)) | 0;
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a.slice(0, k);
+// deterministic helpers (optional rng)
+function rngOrMath(rng) { 
+  return typeof rng === "function" ? rng : Math.random; 
 }
 
-export async function pickRandomPlayableOffline() {
+export function shuffleInPlace(a, rng) {
+  const R = rngOrMath(rng);
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = (R() * (i + 1)) | 0;
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+export function sampleK(a, k, rng) {
+  const arr = a.slice();
+  shuffleInPlace(arr, rng);
+  return arr.slice(0, k);
+}
+
+export function pickOne(a, rng) {
+  const R = rngOrMath(rng);
+  return a[(R() * a.length) | 0];
+}
+
+
+export async function pickRandomPlayableOffline({ rng } = {}) {
   const data = await loadOfflineGen1();
-  const mon = pick(data.mons || data); // backward compat
+  const mon = pickOne(data.mons || data, rng);
   const pool = mon.movesPool?.length ? mon.movesPool : mon.moves;
-  const chosen = sampleK(pool, Math.min(4, pool.length));
+  const chosen = sampleK(pool, Math.min(4, pool.length), rng);
   const chosenMeta = (mon.movesMetaPool || []).filter(m => chosen.includes(m.name));
   return {
     ...mon,
@@ -317,14 +336,14 @@ export async function pickRandomPlayableOffline() {
   };
 }
 
-export async function pickBossFromOffline() {
+export async function pickBossFromOffline({ rng } = {}) {
   const data = await loadOfflineGen1();
   const list = (data.mons || data);
   const pool = list.filter(d => d.isLegendary || d.isMythical);
-  const mon = pick(pool.length ? pool : list);
-
+  const mon = pickOne(pool.length ? pool : list, rng);
+  
   const mp = mon.movesPool?.length ? mon.movesPool : mon.moves;
-  const chosen = sampleK(mp, Math.min(4, mp.length));
+  const chosen = sampleK(mp, Math.min(4, mp.length), rng);
   const chosenMeta = (mon.movesMetaPool || []).filter(m => chosen.includes(m.name));
   return {
     ...mon,

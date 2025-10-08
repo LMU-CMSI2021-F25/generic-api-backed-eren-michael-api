@@ -166,14 +166,34 @@
 .battle-actions { display: flex; gap: 12px; margin-top: 12px; }
 
 .results-bar {
-  grid-column: 1 / -1;
-  display: flex; align-items: center;
-  gap: 12px; margin-top: 8px;
-  border: 2px solid #000; border-radius: 10px;
-  padding: 10px; background: #fff;
-  box-shadow: 3px 3px 0 #000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(240,240,240,.9);
+  border: 1px solid rgba(0,0,0,.1);
+  box-shadow: 0 10px 30px rgba(0,0,0,.15);
+  animation: resultPop .36s ease both;
 }
 .results-bar .spacer { flex: 1; }
+
+.results-bar.is-win    { background: rgba(56, 161, 105, .12); border-color: rgba(56,161,105,.35); }
+.results-bar.is-lose   { background: rgba(229, 62, 62,  .12); border-color: rgba(229, 62, 62, .35); }
+.results-bar.is-tie    { background: rgba(113,128,150,  .12); border-color: rgba(113,128,150,.35); }
+
+@keyframes resultPop {
+  from { opacity: 0; transform: translateY(6px) scale(.98); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+
+@keyframes tinyShake {
+  0%,100%{ transform: translateX(0); }
+  25%    { transform: translateX(-2px); }
+  75%    { transform: translateX(2px); }
+}
+.results-bar.is-lose { animation: resultPop .36s ease both, tinyShake .28s ease .36s 1; }
+
 
 .settings-modal {
   position: fixed;

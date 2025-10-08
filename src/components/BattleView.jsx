@@ -94,8 +94,9 @@ export default function BattleView({ loop }) {
       </div>
 
       {loop.result && (
-        <div className="results-bar">
+        <div className={`results-bar is-${loop.result.toLowerCase()}`}>
           <strong>Result:</strong> {loop.result}
+          {loop.seed && <em style={{marginLeft:8, opacity:.7}}>Seed: {loop.seed}</em>}
           <div className="spacer" />
           <button className="mini-btn" onClick={loop.retryBoss}>Retry Boss</button>
           <button className="mini-btn" onClick={loop.exitToMenu}>Back to Menu</button>
