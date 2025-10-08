@@ -84,9 +84,7 @@ function AppContent() {
         <header className="app-header">
           <h1 className="app-title">Poké Randomizer</h1>
           <p className="app-subtitle">phase: {loop.phase}</p>
-          {settings.seed && /^[A-Z0-9]{6}$/.test(settings.seed) && (
-            <span style={{ marginLeft: 8, opacity: .7 }}>Seed: {settings.seed}</span>
-          )}
+          <div className="app-seed">Seed: {settings.seed}</div>
         </header>
 
         {loop.phase === 'idle' ? (

@@ -107,6 +107,7 @@ export function useGameLoop({ onFxIntro }) {
   });
   const rngRef = useRef(() => Math.random()); // default to non-seeded
   const providerRef = useRef("online"); // "online" | "offline"
+  const gensRef = useRef(null);
 
   const start = useCallback(async ({ selectedGens, offline = false }) => {
   setPhase("intro");
@@ -128,10 +129,10 @@ export function useGameLoop({ onFxIntro }) {
   const [boss, candidate] = await Promise.all([
     offline
       ? pickBossFromOffline({ rng: rngRef.current })
-      : pickBossFromGenerations(selectedGens, { rng: rngRef.current }),
+      : pickBossFromGenerations(gensRef.current, { rng: rngRef.current }),
     offline
       ? pickRandomPlayableOffline({ rng: rngRef.current })
-      : pickRandomPlayable({ rng: rngRef.current }),
+      : pickRandomPlayable({ rng: rngRef.current, gens: gensRef.current }),
   ]);
   bossRef.current = boss;
   playerRef.current = {
@@ -141,6 +142,7 @@ export function useGameLoop({ onFxIntro }) {
   const rer = REROLLS_BY_DIFFICULTY[settings.difficulty] ?? REROLLS_BY_DIFFICULTY.standard;
   setRerollsLeft(rer);
 
+  gensRef.current = selectedGens ?? null;
   providerRef.current = offline ? "offline" : "online";
   // move into battle phase (App will hide overlay afterwards)
   setPhase("battle");
@@ -153,7 +155,7 @@ export function useGameLoop({ onFxIntro }) {
     const P = playerRef.current;
     const srcRaw = providerRef.current === "offline"
       ? await pickRandomPlayableOffline({ rng: rngRef.current })
-      : await pickRandomPlayable({ rng: rngRef.current });
+      : await pickRandomPlayable({ rng: rngRef.current, gens: gensRef.current });
     const src = { ...srcRaw, display: srcRaw.name, movesFrom: srcRaw.name}
     const next = { ...P.candidate };
     
@@ -251,7 +253,7 @@ export function useGameLoop({ onFxIntro }) {
     const nextLocks = { ...P.locks, [key]: true };
     const srcRaw = providerRef.current === "offline"
       ? await pickRandomPlayableOffline({ rng: rngRef.current })
-      : await pickRandomPlayable({ rng: rngRef.current });
+      : await pickRandomPlayable({ rng: rngRef.current, gens: gensRef.current });
     const newSource = { ...srcRaw, display: srcRaw.name, movesFrom: srcRaw.name };
     const merged = composeCandidateFrom(P.candidate, nextLocks, newSource);
     playerRef.current = { candidate: merged, locks: nextLocks };

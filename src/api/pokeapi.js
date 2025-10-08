@@ -222,11 +222,17 @@ export async function pickBossFromGenerations(genIdsOrSet, { rng } = {}) {
   return playableFromSpecies(chosen.name, { rng });
 }
 
-/* random playable mon across any generation (quick) */
-export async function pickRandomPlayable({ rng } = {}) {
-  const R = rngOrMath(rng);
-  const randGen = 1 + ((R() * 9) | 0);
-  const list = await speciesByGeneration(randGen);
+export async function pickRandomPlayable({ rng, gens } = {}) {
+  const ids = gens && gens.size ? Array.from(gens) : null;
+  let list = [];
+  if (ids) {
+    const all = await Promise.all(ids.map((id) => speciesByGeneration(id)));
+    list = all.flat();
+  } else {
+    // fallback: all known gens 1..9 (adjust if you support more)
+    const all = await Promise.all(Array.from({ length: 9 }, (_, i) => speciesByGeneration(i + 1)));
+    list = all.flat();
+  }
   const s = pickOne(list, rng);
   return playableFromSpecies(s.name, { rng });
 }
@@ -341,7 +347,7 @@ export async function pickBossFromOffline({ rng } = {}) {
   const list = (data.mons || data);
   const pool = list.filter(d => d.isLegendary || d.isMythical);
   const mon = pickOne(pool.length ? pool : list, rng);
-  
+
   const mp = mon.movesPool?.length ? mon.movesPool : mon.moves;
   const chosen = sampleK(mp, Math.min(4, mp.length), rng);
   const chosenMeta = (mon.movesMetaPool || []).filter(m => chosen.includes(m.name));
