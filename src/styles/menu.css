@@ -70,6 +70,19 @@
   align-content: start;
 }
 
+.gen-list li:first-child {
+  margin-top: 0;
+}
+
+.gen-list .btn {
+  outline: none;
+}
+
+.gen-list .btn:focus-visible {
+  outline: 2px solid var(--accent, #4da3ff);
+  outline-offset: 2px;
+}
+
 /* Tile buttons scoped to menu to avoid overriding global .btn */
 .menu-grid .btn {
   width: 100%;
@@ -124,4 +137,97 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
+}
+
+.battle-wrap {
+  max-width: 1200px;
+  margin: 24px auto;
+  padding: 0 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+@media (max-width: 860px){ .battle-wrap { grid-template-columns: 1fr; } }
+
+.battle-col .card {
+  border: 2px solid #000;
+  border-radius: 12px;
+  padding: 12px;
+  background: #fff; color: #000;
+  box-shadow: 4px 4px 0 #000;
+}
+.row { margin: 6px 0; }
+.moves { margin: 6px 0 0 20px; }
+
+.lockline { display: flex; align-items: center; gap: 8px; }
+.lock { border: 2px solid #000; background: #fff; color: #000; border-radius: 6px; width: 28px; height: 28px; }
+.lock.on { background: #000; color: #fff; }
+
+.battle-actions { display: flex; gap: 12px; margin-top: 12px; }
+
+.results-bar {
+  grid-column: 1 / -1;
+  display: flex; align-items: center;
+  gap: 12px; margin-top: 8px;
+  border: 2px solid #000; border-radius: 10px;
+  padding: 10px; background: #fff;
+  box-shadow: 3px 3px 0 #000;
+}
+.results-bar .spacer { flex: 1; }
+
+.settings-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(0,0,0,.35);
+}
+
+.settings-card {
+  width: min(560px, 92vw);
+  background: #fff;
+  color: #000;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.35);
+  padding: 16px 18px;
+}
+
+/* One control per line */
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+.settings-row:last-of-type {
+  border-bottom: none;
+}
+
+.settings-row > span {
+  font-weight: 600;
+}
+
+/* Inputs align neatly on the right */
+.settings-row select,
+.settings-row input[type="text"] {
+  min-width: 180px;
+}
+
+/* Actions row */
+.settings-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+.settings-actions .spacer {
+  flex: 1;
 }

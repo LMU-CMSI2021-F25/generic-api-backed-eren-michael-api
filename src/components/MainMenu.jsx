@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { listGenerations } from '../api/pokeapi.js';
+import { useSettings } from './SettingsContext.jsx';
+import SettingsPanel from './SettingsPanel.jsx';
 import '../styles/menu.css';
 
 export default function MainMenu({
@@ -7,14 +9,14 @@ export default function MainMenu({
   onRetry,
   onGoOffline,
   onFight,
-  muted,
-  setMuted,
   selectedGens,
   setSelectedGens,
 }) {
   const [gens, setGens] = useState([]);
   const [blinkKey, setBlinkKey] = useState(0);
   const scrollRef = useRef(null);
+  const { settings, set } = useSettings();
+  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -73,19 +75,20 @@ export default function MainMenu({
           </button>
 
           <div className="row-two">
-            <button className="btn" onClick={() => alert("Settings TBD")}>
+            <button className="btn" onClick={() => setShowSettings(true)}>
               <span>Settings</span>
             </button>
             <button
               className="btn"
-              data-active={muted ? "true" : "false"}
-              onClick={() => setMuted(!muted)}
+              data-active={settings.muted ? "true" : "false"}
+              onClick={() => set({ muted: !settings.muted })}
             >
-              <span>{muted ? "Unmute" : "Mute"}</span>
+              <span>{settings.muted ? "Unmute" : "Mute"}</span>
             </button>
           </div>
         </div>
       </section>
+      {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} />}
     </div>
   );
 }
