@@ -39,9 +39,15 @@ export default function BattleView({ loop }) {
           <div className="sprite-wrap">
             {boss?.sprites && (
               <img
-                className={`sprite ${settings.spriteStyle === "gb" ? "pixel" : "modern"}`}
-                src={pickSprite(boss)}
-                alt={boss.name}
+                className={`sprite ${settings.spriteStyle === "gb" ? "pixel" : "modern"} ${
+                  loop.result
+                    ? "boss-ko" // KO animation when battle ends
+                    : loop.phase === "fight"
+                    ? "boss-appear" // intro animation when battle starts
+                    : ""
+                }`}
+                src={pickSprite(loop.boss) ?? Pokeball}
+                alt={loop.boss.name ?? "boss"}
                 width={160}
                 height={160}
                 draggable={false}

@@ -35,19 +35,45 @@ function metaForMove(name, metaList) {
 
 /* Merge: keep locked fields from A, fill others from B (one Pokemon source) */
 function composeCandidateFrom(current, locks, source) {
+  // utility to pick from current if locked, otherwise from source
+  const pick = (k) => (locks[k] ? current?.[k] : source?.[k]);
+
+  const display =
+    current?.display ??
+    source?.display ??
+    source?.name ??
+    current?.name ??
+    "";
+
+  const movesFrom =
+    locks.moves
+      ? (current?.movesFrom ?? current?.display ?? current?.name ?? "")
+      : (source?.movesFrom ?? source?.display ?? source?.name ?? "");
+
   return {
-    display: source.name,
-    types:   locks.type     ? current.types : source.types,
-    hp:      locks.hp       ? current.hp    : source.hp,
-    atk:     locks.offenses ? current.atk   : source.atk,
-    spAtk:   locks.offenses ? current.spAtk : source.spAtk,
-    def:     locks.defenses ? current.def   : source.def,
-    spDef:   locks.defenses ? current.spDef : source.spDef,
-    speed:   locks.speed    ? current.speed : source.speed,
-    moves:     locks.moves ? current.moves     : source.moves,
-    movesFrom: locks.moves ? current.movesFrom : source.name,
+    // keep stable identity fields so UI doesn't crash
+    id: current?.id ?? source?.id,
+    name: current?.name ?? source?.name,
+    display,
+    // 🔑 keep sprites present so BattleView can render images after a lock
+    sprites: current?.sprites ?? source?.sprites,
+
+    // stats/typing obey locks
+    types:  (locks.type ? current?.types : source?.types) ?? [],
+    hp:     pick("hp")     ?? 0,
+    atk:    locks.offenses ? current?.atk   : source?.atk,
+    spAtk:  locks.offenses ? current?.spAtk : source?.spAtk,
+    def:    locks.defenses ? current?.def   : source?.def,
+    spDef:  locks.defenses ? current?.spDef : source?.spDef,
+    speed:  pick("speed")  ?? 0,
+
+    // moves & metadata (UI sometimes reads movesMeta)
+    moves:      locks.moves ? (current?.moves ?? []) : (source?.moves ?? []),
+    movesMeta:  locks.moves ? (current?.movesMeta ?? source?.movesMeta ?? []) : (source?.movesMeta ?? []),
+    movesFrom,
   };
 }
+
 
 const allLocked = (L) => L.type && L.offenses && L.defenses && L.hp && L.moves && L.speed;
 
