@@ -179,3 +179,24 @@ body {
   font-size: 0.95rem;
 }
 
+/*Sprites*/
+.sprite-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;       /* adjust to taste */
+  margin-bottom: 8px;
+}
+
+/*Keep images responsive within the slot (we also pass width/height attributes) */
+.sprite {
+  max-width: 100%;
+  height: auto;
+  transition: opacity 160ms ease; /* optional: smoother swap */
+}
+
+/* Make pixel sprites look like proper pixels */
+.sprite.pixel {
+  image-rendering: pixelated;
+}
+

@@ -149,6 +149,7 @@ export async function pokemonCore(nameOrId) {
       return acc;
     }, {}),
     moveRefs: p.moves.map(m => ({ name: m.move.name, url: m.move.url })),
+    sprites: spriteUrlsForId(p.id, p.sprites),
   };
   return setCache(key, core);
 }
@@ -202,6 +203,7 @@ export async function playableFromSpecies(speciesName, { rng } = {}) {
     speed: core.stats.speed,
     moves: chosen.map(m => m.name),
     movesMeta: chosen,
+    sprites: core.sprites,
   };
 }
 
@@ -339,6 +341,7 @@ export async function pickRandomPlayableOffline({ rng } = {}) {
     movesMeta: chosenMeta,
     display: mon.name,
     movesFrom: mon.name,
+    sprites: spriteUrlsForId(mon.id),
   };
 }
 
@@ -357,7 +360,32 @@ export async function pickBossFromOffline({ rng } = {}) {
     movesMeta: chosenMeta,
     display: mon.name,
     movesFrom: mon.name,
+    sprites: spriteUrlsForId(mon.id),
   };
 }
+
+// --- Sprite helpers ---------------------------------------------------------
+function spriteUrlsForId(id, apiSprites = {}) {
+  // Prefer official artwork for "modern", and a small pixel sprite for "gb"
+  const official =
+    apiSprites?.other?.["official-artwork"]?.front_default ??
+    `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+
+  // Consistent 96×96 pixel look that loads fast; great for GB-style
+  const pixel =
+    apiSprites?.front_default ??
+    `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
+
+  // Optional fallbacks people sometimes like:
+  const showdown =
+    apiSprites?.other?.showdown?.front_default ??
+    apiSprites?.front_default ??
+    pixel;
+
+  const dreamWorld = apiSprites?.other?.dream_world?.front_default ?? null;
+
+  return { official, pixel, showdown, dreamWorld };
+}
+
 
 export { API_BASE };

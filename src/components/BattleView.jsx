@@ -1,6 +1,8 @@
 import "../styles/menu.css";
+import { useSettings } from "./SettingsContext";
 
 export default function BattleView({ loop }) {
+  const { settings } = useSettings();
   const boss = loop.boss;
   const p    = loop.player?.candidate;
   const L    = loop.player?.locks;
@@ -8,6 +10,12 @@ export default function BattleView({ loop }) {
 
   const icon = (locked) => (locked ? "🔒" : "🔓");
   const ready = loop.isReady();
+  const pickSprite = (mon) => {
+    if (!mon?.sprites) return null;
+    return settings.spriteStyle === "gb"
+      ? (mon.sprites.pixel ?? mon.sprites.official)
+      : (mon.sprites.official ?? mon.sprites.pixel);
+  };
 
   return (
     <div className="battle-wrap">
@@ -15,6 +23,18 @@ export default function BattleView({ loop }) {
       <div className="battle-col boss">
         <h3 className="panel-title">BOSS</h3>
         <div className="card">
+          <div className="sprite-wrap">
+            {boss?.sprites && (
+              <img
+                className={`sprite ${settings.spriteStyle === "gb" ? "pixel" : "modern"}`}
+                src={pickSprite(boss)}
+                alt={boss.name}
+                width={160}
+                height={160}
+                draggable={false}
+              />
+            )}
+          </div>
           <div className="row"><strong>{boss.name}</strong></div>
           <div className="row">Type: {boss.types.join(" / ")}</div>
           <div className="row">HP: {boss.hp}</div>
@@ -33,6 +53,19 @@ export default function BattleView({ loop }) {
         <h3 className="panel-title">YOUR BUILD</h3>
         <div className="row"><em>Current source: {p.display}</em></div>
         <div className="card">
+          <div className="sprite-slot">
+            <img
+              className={`sprite ${settings.spriteStyle === "gb" ? "pixel" : "modern"}`}
+              src={pickSprite(p) ?? Pokeball}
+              alt={p.name}
+              width={160}
+              height={160}
+              draggable={false}
+              // Key ensures the <img> is replaced when the Pokémon changes (cleaner transitions)
+              key={`${p.id}-${loop.rerollsLeft}`}
+            />
+          </div>
+          
           <div className="row lockline">
             <button className={`lock ${L.type ? "on" : ""}`} onClick={() => loop.toggleLock("type")} disabled={L.type}>
               {icon(L.type)}
