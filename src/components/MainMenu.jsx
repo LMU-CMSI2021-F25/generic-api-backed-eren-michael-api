@@ -3,6 +3,7 @@ import { listGenerations } from '../api/pokeapi.js';
 import { useSettings } from './SettingsContext.jsx';
 import SettingsPanel from './SettingsPanel.jsx';
 import '../styles/menu.css';
+import ashHero from "../assets/ash-hero.png";
 
 function GenWarningModal({ onClose }) {
   return (
@@ -126,6 +127,9 @@ export default function MainMenu({
       </section>
       {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} />}
       {showGenWarning && <GenWarningModal onClose={() => setShowGenWarning(false)} />}
+      <div className="menu-ash">
+        <img src={ashHero } alt="Ash" draggable={false} />
+      </div>
     </div>
   );
 }

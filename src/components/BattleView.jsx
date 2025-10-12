@@ -1,5 +1,6 @@
 import "../styles/menu.css";
 import { useSettings } from "./SettingsContext";
+import { useEffect, useRef, useState } from "react";
 
 export default function BattleView({ loop }) {
   const { settings } = useSettings();
@@ -10,6 +11,18 @@ export default function BattleView({ loop }) {
 
   const icon = (locked) => (locked ? "🔒" : "🔓");
   const ready = loop.isReady();
+  const [pulse, setPulse] = useState(false);
+  const prevRerolls = useRef(loop.rerollsLeft);
+
+  useEffect(() => {
+  // fire only when user spends a reroll (value goes down)
+    if (loop.rerollsLeft < prevRerolls.current) {
+      setPulse(true);
+      const t = setTimeout(() => setPulse(false), 200); // keep in sync with CSS .18s
+      return () => clearTimeout(t);
+    }
+    prevRerolls.current = loop.rerollsLeft;
+  }, [loop.rerollsLeft]);
   const pickSprite = (mon) => {
     if (!mon?.sprites) return null;
     return settings.spriteStyle === "gb"
@@ -42,6 +55,9 @@ export default function BattleView({ loop }) {
           <div className="row">Defense: {boss.def} • Sp.Def: {boss.spDef}</div>
           <div className="row">Speed: {boss.speed}</div>
           <div className="row">Moves:</div>
+          <div className="row">
+            {p.types.map(t => <span key={t} className={`badge type ${t}`}>{t.toUpperCase()}</span>)}
+          </div>
           <ul className="moves">
             {boss.moves.map((m) => <li key={m}>{m}</li>)}
           </ul>
@@ -52,8 +68,8 @@ export default function BattleView({ loop }) {
       <div className="battle-col player">
         <h3 className="panel-title">YOUR BUILD</h3>
         <div className="row"><em>Current source: {p.display}</em></div>
-        <div className="card">
-          <div className="sprite-slot">
+        <div className={`card ${pulse ? "rerolled" : ""}`}>
+          <div className={`sprite-slot ${pulse ? "rerolled" : ""}`}>
             <img
               className={`sprite ${settings.spriteStyle === "gb" ? "pixel" : "modern"}`}
               src={pickSprite(p) ?? Pokeball}
@@ -62,16 +78,17 @@ export default function BattleView({ loop }) {
               height={160}
               draggable={false}
               // Key ensures the <img> is replaced when the Pokémon changes (cleaner transitions)
-              key={`${p.id}-${loop.rerollsLeft}`}
+              key={`${p.display ?? p.name}-${loop.rerollsLeft}`}
             />
           </div>
-          
+
           <div className="row lockline">
             <button className={`lock ${L.type ? "on" : ""}`} onClick={() => loop.toggleLock("type")} disabled={L.type}>
               {icon(L.type)}
             </button>
             Type: {p.types.join(" / ")}
           </div>
+
 
           <div className="row lockline">
             <button className={`lock ${L.offenses ? "on" : ""}`} onClick={() => loop.toggleLock("offenses")} disabled={L.offenses}>
@@ -127,14 +144,18 @@ export default function BattleView({ loop }) {
       </div>
 
       {loop.result && (
-        <div className={`results-bar is-${loop.result.toLowerCase()}`}>
+        <div
+          className={`results-bar is-${(loop.result || "").toLowerCase()}`}
+          aria-live="polite"
+        >
           <strong>Result:</strong> {loop.result}
-          {loop.seed && <em style={{marginLeft:8, opacity:.7}}>Seed: {loop.seed}</em>}
+          {loop.seed && <em style={{ marginLeft: 8, opacity: .7 }}>Seed: {loop.seed}</em>}
           <div className="spacer" />
           <button className="mini-btn" onClick={loop.retryBoss}>Retry Boss</button>
           <button className="mini-btn" onClick={loop.exitToMenu}>Back to Menu</button>
         </div>
       )}
+
     </div>
   );
 }

@@ -166,7 +166,8 @@ export function useGameLoop({ onFxIntro }) {
     if (!P.locks.speed)    next.speed = src.speed;
     if (!P.locks.moves)    { next.moves = src.moves; next.movesFrom = src.movesFrom; }
 
-    next.display = src.name
+    next.sprites = src.sprites;
+    next.display = src.display || src.name;
     playerRef.current = { ...P, candidate: next };
     setRerollsLeft(v => v - 1);
     bump();

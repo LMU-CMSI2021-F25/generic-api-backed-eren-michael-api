@@ -200,3 +200,46 @@ body {
   image-rendering: pixelated;
 }
 
+
+:root{
+  --type-normal:#A8A77A; --type-fire:#EE8130; --type-water:#6390F0; --type-electric:#F7D02C;
+  --type-grass:#7AC74C; --type-ice:#96D9D6; --type-fighting:#C22E28; --type-poison:#A33EA1;
+  --type-ground:#E2BF65; --type-flying:#A98FF3; --type-psychic:#F95587; --type-bug:#A6B91A;
+  --type-rock:#B6A136; --type-ghost:#735797; --type-dragon:#6F35FC; --type-dark:#705746;
+  --type-steel:#B7B7CE; --type-fairy:#D685AD;
+}
+
+.type-badges{
+  display:inline-flex; flex-wrap:wrap; gap:.35rem .45rem; margin-left:.5rem;
+}
+
+.badge{display:inline-flex; align-items:center; padding:.2rem .55rem; border-radius:999px;
+  font:600 12px/1 var(--ui-font, ui-sans-serif); letter-spacing:.02em; border:1px solid rgba(0,0,0,.15);
+  box-shadow:0 1px 0 rgba(255,255,255,.35) inset;
+}
+.badge.type.normal  { background:var(--type-normal);  }
+.badge.type.fire    { background:var(--type-fire);    }
+.badge.type.water   { background:var(--type-water);   }
+.badge.type.electric{ background:var(--type-electric);}
+.badge.type.grass   { background:var(--type-grass);   }
+.badge.type.ice     { background:var(--type-ice);     }
+.badge.type.fighting{ background:var(--type-fighting);}
+.badge.type.poison  { background:var(--type-poison);  }
+.badge.type.ground  { background:var(--type-ground);  }
+.badge.type.flying  { background:var(--type-flying);  }
+.badge.type.psychic { background:var(--type-psychic); }
+.badge.type.bug     { background:var(--type-bug);     }
+.badge.type.rock    { background:var(--type-rock);    }
+.badge.type.ghost   { background:var(--type-ghost);   }
+.badge.type.dragon  { background:var(--type-dragon);  }
+.badge.type.dark    { background:var(--type-dark);    }
+.badge.type.steel   { background:var(--type-steel);   }
+.badge.type.fairy   { background:var(--type-fairy);   }
+
+/* readable text color: light types get dark text; darker types get white */
+.badge.type.normal,.badge.type.electric,.badge.type.grass,.badge.type.ice,
+.badge.type.ground,.badge.type.flying,.badge.type.rock,.badge.type.steel,
+.badge.type.fairy { color:#111; }
+.badge.type.fire,.badge.type.water,.badge.type.fighting,.badge.type.poison,
+.badge.type.psychic,.badge.type.bug,.badge.type.ghost,.badge.type.dragon,
+.badge.type.dark { color:#fff; }
