@@ -1,6 +1,8 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/x8aIps7V)
 **CMSI 2021** Web Application Development, Fall 2025, DUE: October 1st
 
+# ACCESS THE WEBSITE HERE: https://lmu-cmsi2021-f25.github.io/generic-api-backed-eren-michael-api/
+
 # Assignment Generic Api Backed
 This assignment aims to level you up in multiple ways:
 * Creating and deploying a React web application
