@@ -39,9 +39,9 @@ function composeCandidateFrom(current, locks, source) {
   const pick = (k) => (locks[k] ? current?.[k] : source?.[k]);
 
   const display =
-    current?.display ??
     source?.display ??
     source?.name ??
+    current?.display ??
     current?.name ??
     "";
 
@@ -55,8 +55,8 @@ function composeCandidateFrom(current, locks, source) {
     id: current?.id ?? source?.id,
     name: current?.name ?? source?.name,
     display,
-    // 🔑 keep sprites present so BattleView can render images after a lock
-    sprites: current?.sprites ?? source?.sprites,
+    // show the new source image on lock
+    sprites: source?.sprites ?? current?.sprites,
 
     // stats/typing obey locks
     types:  (locks.type ? current?.types : source?.types) ?? [],

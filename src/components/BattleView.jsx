@@ -84,7 +84,7 @@ export default function BattleView({ loop }) {
               height={160}
               draggable={false}
               // Key ensures the <img> is replaced when the Pokémon changes (cleaner transitions)
-              key={`${p.display ?? p.name}-${loop.rerollsLeft}`}
+              key={p.display ?? p.name}
             />
           </div>
 
