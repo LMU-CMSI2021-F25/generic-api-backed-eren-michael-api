@@ -217,12 +217,10 @@
   font-weight: 600;
 }
 
-
 .settings-row select,
 .settings-row input[type="text"] {
   min-width: 180px;
 }
-
 
 .settings-actions {
   display: flex;
@@ -237,13 +235,9 @@
   flex: 1;
 }
 
-
-
-
 .menu {
   padding-bottom: clamp(180px, 26vw, 300px);
 }
-
 
 .menu-ash {
   position: fixed;                       
@@ -275,8 +269,6 @@
   to   { transform: scale(1);   filter: none; }
 }
 
-
-
 .results-bar{
   position: sticky;          
   bottom: 0;
@@ -295,17 +287,13 @@
 .results-bar strong { font-weight: 800; letter-spacing: .02em; }
 .results-bar .spacer { flex: 1; }
 
-
 .results-bar.is-win  { background: rgba(122,199,76,.20);  border-color: rgba(122,199,76,.35); }
 .results-bar.is-lose { background: rgba(201, 65,65 ,.20); border-color: rgba(201, 65,65 ,.35); }
 .results-bar.is-tie  { background: rgba(169,143,243,.20); border-color: rgba(169,143,243,.35); }
 
-
 @supports (padding: env(safe-area-inset-bottom)) {
   .results-bar{ padding-bottom: calc(.6rem + env(safe-area-inset-bottom)); }
 }
-
-
 
 .boss-appear {
   animation: bossIntro 0.8s ease-out;
@@ -317,7 +305,6 @@
   100% { opacity: 1; transform: scale(1); filter: none; }
 }
 
-
 .boss-ko {
   animation: bossKO 0.6s ease-in forwards;
 }
@@ -326,4 +313,18 @@
   0% { opacity: 1; transform: scale(1); filter: brightness(1); }
   50% { opacity: 0.8; transform: scale(1.2); filter: brightness(2); }
   100% { opacity: 0; transform: scale(0.6) rotate(8deg); filter: blur(2px) brightness(0.3); }
+}
+
+/* sprite default + vanish transition */
+.sprite {
+  display: block;
+  max-width: 160px;          /* or whatever you’re using */
+  margin: 0 auto 8px;
+  image-rendering: pixelated; /* if you want the GB vibe */
+  transition: opacity .35s ease, transform .35s ease;
+}
+
+.sprite.vanish {
+  opacity: 0;
+  transform: scale(.96) translateY(4px);
 }

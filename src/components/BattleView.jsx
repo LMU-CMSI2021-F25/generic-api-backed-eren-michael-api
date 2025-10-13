@@ -14,6 +14,10 @@ export default function BattleView({ loop }) {
   const [pulse, setPulse] = useState(false);
   const prevRerolls = useRef(loop.rerollsLeft);
 
+  const verdict = loop.result; // "Win" | "Lose" | "Tie" | null
+  const bossVanish   = verdict === "Win";
+  const playerVanish = verdict === "Lose";
+
   useEffect(() => {
   // fire only when user spends a reroll (value goes down)
     if (loop.rerollsLeft < prevRerolls.current) {
@@ -37,33 +41,21 @@ export default function BattleView({ loop }) {
         <h3 className="panel-title">BOSS</h3>
         <div className="card">
           <div className="sprite-wrap">
-            {boss?.sprites && (
+            {pickSprite(boss) && (
               <img
-                className={`sprite ${settings.spriteStyle === "gb" ? "pixel" : "modern"} ${
-                  loop.result
-                    ? "boss-ko" // KO animation when battle ends
-                    : loop.phase === "fight"
-                    ? "boss-appear" // intro animation when battle starts
-                    : ""
-                }`}
-                src={pickSprite(loop.boss) ?? Pokeball}
-                alt={loop.boss.name ?? "boss"}
-                width={160}
-                height={160}
-                draggable={false}
+                className={`sprite ${bossVanish ? "vanish" : ""}`}
+                src={pickSprite(boss)}
+                alt={boss.name}
               />
             )}
           </div>
           <div className="row"><strong>{boss.name}</strong></div>
-          <div className="row">Type: {boss.types.join(" / ")}</div>
+          <div className="row">Type: {boss.types.map(t => <span key={t} className={`badge type ${t}`}>{t.toUpperCase()}</span>)}</div>
           <div className="row">HP: {boss.hp}</div>
           <div className="row">Attack: {boss.atk} • Sp.Atk: {boss.spAtk}</div>
           <div className="row">Defense: {boss.def} • Sp.Def: {boss.spDef}</div>
           <div className="row">Speed: {boss.speed}</div>
           <div className="row">Moves:</div>
-          <div className="row">
-            {p.types.map(t => <span key={t} className={`badge type ${t}`}>{t.toUpperCase()}</span>)}
-          </div>
           <ul className="moves">
             {boss.moves.map((m) => <li key={m}>{m}</li>)}
           </ul>
@@ -76,23 +68,21 @@ export default function BattleView({ loop }) {
         <div className="row"><em>Current source: {p.display}</em></div>
         <div className={`card ${pulse ? "rerolled" : ""}`}>
           <div className={`sprite-slot ${pulse ? "rerolled" : ""}`}>
-            <img
-              className={`sprite ${settings.spriteStyle === "gb" ? "pixel" : "modern"}`}
-              src={pickSprite(p) ?? Pokeball}
-              alt={p.name}
-              width={160}
-              height={160}
-              draggable={false}
-              // Key ensures the <img> is replaced when the Pokémon changes (cleaner transitions)
-              key={p.display ?? p.name}
-            />
+            {pickSprite(p) && (
+              <img
+                className={`sprite ${playerVanish ? "vanish" : ""}`}
+                key={p.display ?? p.name}  /* remount on lock/reroll */
+                src={pickSprite(p)}
+                alt={p.display || p.name}
+              />
+            )}
           </div>
 
           <div className="row lockline">
             <button className={`lock ${L.type ? "on" : ""}`} onClick={() => loop.toggleLock("type")} disabled={L.type}>
               {icon(L.type)}
             </button>
-            Type: {p.types.join(" / ")}
+            Type: {p.types.map(t => <span key={t} className={`badge type ${t}`}>{t.toUpperCase()}</span>)}
           </div>
 
 
