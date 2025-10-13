@@ -1,4 +1,29 @@
+[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/x8aIps7V)
 **CMSI 2021** Web Application Development, Fall 2025, DUE: October 1st
+
+# ACCESS THE WEBSITE HERE: https://lmu-cmsi2021-f25.github.io/generic-api-backed-eren-michael-api/
+
+## 🎲 Pokémon Randomizer Website
+
+A dynamic web app that lets users generate randomized Pokémon encounters and compare player stats against bosses from any generation. Built with **React** and **Vite**, the site focuses on speed, interactivity, and a clean, responsive interface.
+
+### ✨ Features
+- ⚔️ Randomized Pokémon battles with real data fetched from **PokeAPI**  
+- 🧬 Generation selector supporting all Pokémon eras (I–IX)  
+- 💥 Real-time stat comparison between player and boss Pokémon  
+- 🎛️ Smooth UI transitions and responsive layouts for all screen sizes  
+- 🔄 Instant rerolls without page refresh for fast experimentation  
+
+### 🛠️ Tech Stack
+- **React + Vite** for a modern, lightning-fast frontend  
+- **PokeAPI** for accurate and up-to-date Pokémon data  
+- **CSS Grid & Flexbox** for layout responsiveness  
+- **GitHub Pages** for seamless deployment and hosting  
+
+### 🚀 Project Goal
+To create a fun, data-driven Pokémon experience that blends battle randomness with real stat mechanics, while demonstrating strong front-end development and design principles.
+
+---
 
 # Assignment Generic Api Backed
 This assignment aims to level you up in multiple ways:
